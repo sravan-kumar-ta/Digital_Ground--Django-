@@ -9,12 +9,12 @@
     {% include 'partials/_messages.html' %}
 
     <section class="hero pb-3 bg-cover bg-center d-flex align-items-center mt-3"
-             style="background: url({% static 'img/hero-jewlrey-banner.jpg' %})">
+             style="background: url({% static 'img/banner2.png' %})">
         <div class="container py-5">
             <div class="row px-4 px-lg-5">
                 <div class="col-lg-6">
-                    <p class="text-muted small text-uppercase mb-2">New Inspiration 2020</p>
-                    <h1 class="h2 text-uppercase mb-3">20% off on new season</h1>
+                    <h1 class="h2 mb-2">You're welcome!</h1>
+                    <p class="text-muted small text-uppercase mb-3">Thanks for choosing us... Happy shopping!</p>
                     <a class="btn btn-dark" href="{% url 'products:category' %}">
                         Browse all categories
                     </a>
@@ -35,7 +35,11 @@
             {% for category in categories %}
             <div class="col-md-4 mb-4 mb-md-0">
                 <a class="category-item" href="{{ category.get_url }}">
+                    {% if category.image %}
+                    <img class="img-fluid" src="{{ category.image.url }}" alt="{{ category.title }}">
+                    {% else %}
                     <img class="img-fluid" src="{% static 'img/cat-img.jpg' %}" alt="{{ category.title }}">
+                    {% endif %}
                     <strong class="category-item-title">{{ category.title }}</strong>
                 </a>
             </div>

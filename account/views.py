@@ -118,7 +118,6 @@ class WishlistView(ListView):
         return super().get_queryset().filter(user=self.request.user)
 
 
-@method_decorator(login_required(login_url='login'), name='dispatch')
 def add_to_wishlist(request):
     p_id = request.GET['prod_id']
     product = get_object_or_404(Product, id=p_id)

@@ -32,7 +32,7 @@
                             <small class="text-danger">{{ field.errors|striptags }}</small>
                         </div>
                         {% endfor %}
-                        <button class="btn btn-primary" type="submit">Submit</button>
+                        <button class="btn btn-primary" type="submit" id="submit">Submit</button>
                     </fieldset>
 
                     {% if form.non_field_errors %}
@@ -52,3 +52,18 @@
     </div>
 </div>
 {% endblock content %}
+
+{% block script %}
+<script>
+$(document).ready(function(){
+    $("#submit").on('click',function(e){
+        var _phone_number = $("input[name='phone_number']").val();
+        if ( !$.isNumeric(_phone_number) ){
+            e.preventDefault();
+            alert("Enter valid phone number");
+        }
+    });
+});
+
+</script>
+{% endblock script %}

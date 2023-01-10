@@ -92,7 +92,12 @@ def handle_request(request):
 
             cart_item.delete()
 
-            return render(request, 'orders/payment_status.html', {'status': True})
+            context = {
+                'status': True,
+                'order': order,
+            }
+
+            return render(request, 'orders/payment_status.html', context)
         except:
             return render(request, 'orders/payment_status.html', {'status': False})
     else:
@@ -114,7 +119,6 @@ def order_detail(request, o_id):
     return render(request, 'orders/order_detail.html', context)
 
 
-@login_required(login_url='login')
 def render_to_pdf(template_src, context_dict):
     template = get_template(template_src)
     html = template.render(context_dict)
@@ -130,7 +134,7 @@ def generate_invoice(request, o_id):
     try:
         order = Order.objects.get(id=o_id, user=request.user, payment_status=1)
     except:
-        return HttpResponse("505 Not Found")
+        return HttpResponse("<h1>505 Not Found</h1>")
 
     data = {
         'order_id': order.order_id,

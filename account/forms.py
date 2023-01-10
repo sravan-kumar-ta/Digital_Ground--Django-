@@ -10,7 +10,7 @@ from account.models import CustomUser
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        exclude = ['password', 'is_admin', 'is_active', 'is_superuser', 'is_staff']
+        fields = ('first_name', 'last_name', 'username', 'email', 'phone_number')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

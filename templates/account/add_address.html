@@ -20,6 +20,11 @@
 
                 {% include 'partials/_messages.html' %}
 
+                <div class="alert w-75 m-auto alert-warning" role="alert" id="pinAlert">
+                    <strong>Please wait..!</strong>&nbsp&nbsp&nbsp
+                    We are trying to find your exact location using the pin code you entered.
+                </div>
+
                 <form method="post" action="">
                     {% csrf_token %}
                     <fieldset>
@@ -67,6 +72,7 @@
 {% block script %}
 <script>
 $(document).ready(function(){
+    $("#pinAlert").hide();
     $(".form-control").removeAttr('disabled');
     $("#id_pin").on('blur',function(){
         let _pinCode = $(this).val();
@@ -79,8 +85,10 @@ $(document).ready(function(){
             dataType: 'json',
             beforeSend: function(){
                 $(".form-control").attr('disabled', 'disabled');
+                $("#pinAlert").show();
             },
             success: function(res){
+                $("#pinAlert").hide();
                 $(".form-control").removeAttr('disabled');
                 $("#id_state").val(res.data.state);
                 $("#id_city").val(res.data.district);
@@ -90,11 +98,13 @@ $(document).ready(function(){
                 console.log(res.data);
             },
             error: function(){
+                $("#pinAlert").hide();
                 alert("Enter a valid PIN Code.")
                 $(".form-control").removeAttr('disabled');
             }
         })
     });
 });
+
 </script>
 {% endblock script %}

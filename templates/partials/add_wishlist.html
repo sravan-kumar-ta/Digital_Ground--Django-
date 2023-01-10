@@ -7,6 +7,10 @@
             var _url = '{% url "add_wishlist" %}';
             var _redirectUrl = '{% url "wishlist" %}';
 
+            console.log(_redirectUrl)
+            console.log(_url)
+            console.log(_prodId)
+
             $.ajax({
                 url:_url,
                 data:{

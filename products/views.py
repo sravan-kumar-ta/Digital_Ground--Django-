@@ -142,7 +142,7 @@ def details_of_product(request, c_slug, p_slug):
 def cart(request):
     cart_obj = list()
     total_price = 0
-    context = None
+    context = {}
 
     if request.user.is_authenticated:
         products = Cart.objects.filter(user=request.user)
@@ -176,6 +176,7 @@ def cart(request):
                 }
                 total_price += total
                 cart_obj.append(temp)
+                print(cart_obj)
 
             request.session['cart_length'] = len(request.session['cart'])
 

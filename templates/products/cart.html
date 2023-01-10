@@ -189,7 +189,8 @@
                         <form action="{% url 'checkout' %}" id="myform" class="mt-2" method="get">
                             {% for address in cart_products.addresses %}
                             <div class="mb-3 border px-2 shadow">
-                                <input type="radio" name="address" value="{{address.id}}" id="id_{{address.id}}">
+                                <input type="radio" name="address" value="{{address.id}}"
+                                       class="address" id="id_{{address.id}}">
                                 <strong>Address {{forloop.counter}}</strong><br>
                                 <label class="px-3" for="id_{{address.id}}" style="cursor:pointer">
                                     {{address.phone_number}}
@@ -199,10 +200,15 @@
                             </div>
                             {% endfor %}
 
-                            <button type="submit" class="btn btn-dark btn-lg btn-outline-dark">
+                            <button type="submit" class="btn btn-dark btn-lg btn-outline-dark" id="checkout">
                                 Proceed to checkout
                             </button>
                         </form>
+                        {% else %}
+                        <a type="submit" href="{% url 'add_address' %}"
+                           class="btn btn-dark btn-outline-dark">
+                            Create an address before checkout
+                        </a>
                         {% endif %}
                         {% else %}
 
@@ -230,3 +236,19 @@
 
 </div>
 {% endblock content %}
+
+{% block script %}
+<script>
+$(document).ready(function(){
+    $("#checkout").on('click',function(e){
+
+        if( !$('.address').is(':checked') ) {
+            e.preventDefault();
+            alert("Please select an address for checkout this order.!");
+        }
+
+    });
+});
+
+</script>
+{% endblock script %}
