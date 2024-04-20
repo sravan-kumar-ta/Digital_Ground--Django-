@@ -55,7 +55,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'wishlist' %}">
                             <i class="fas fa-heart mr-1 text-gray"></i>
-                            <span class="text-primary">({{ wishlist_len }})</span>
+                            <span class="text-primary">
+                                (<span id="wishlist_id">{{ wishlist_len }}</span>)
+                            </span>
                         </a>
                     </li>
                     <li class="nav-item dropdown">

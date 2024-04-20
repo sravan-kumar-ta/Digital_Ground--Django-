@@ -1,0 +1,10 @@
+SECRET_KEY=<Your project secret key>
+EMAIL_HOST_USER=<Your email id>
+EMAIL_HOST_PASSWORD=<password>
+
+RAZORPAY_KEY_ID=<Your razorpay key id>
+RAZORPAY_KEY_SECRET=<Your razorpay key secret>
+
+TWILIO_ACCOUNT_SID=<Your twilio id>
+TWILIO_AUTH_TOKEN=<Your twilio auth token>
+TWILIO_VERIFY_SERVICE_SID=<Your twilio verify sid>

@@ -119,12 +119,14 @@ class WishlistView(ListView):
 
 
 def add_to_wishlist(request):
+    """
     p_id = request.GET['prod_id']
     product = get_object_or_404(Product, id=p_id)
+
     try:
         obj = Wishlist.objects.create(product=product, user=request.user)
         obj.save()
-        messages.success(request, 'Item added to your wishlist.')
+        # messages.success(request, 'Item added to your wishlist.')
     except:
         data = 0
     else:
@@ -132,6 +134,17 @@ def add_to_wishlist(request):
 
     # The data will be checked in ajax. If 1, redirect to wishlist page.
     return JsonResponse({'data': data})
+    """
+    try:
+        product_id = request.GET.get('prod_id')
+        product = get_object_or_404(Product, id=product_id)
+        wishlist_item, created = Wishlist.objects.get_or_create(product=product, user=request.user)
+        response_data = {'data': 1 if created else 0}
+    except Exception as e:
+        print(e)
+        response_data = {'data': 0}
+
+    return JsonResponse(response_data)
 
 
 @login_required(login_url='login')

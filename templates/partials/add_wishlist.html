@@ -1,15 +1,12 @@
 <script>
     $(document).ready(function() {
         console.log("function ready");
+        var wishlist_len = parseInt($('#wishlist_id').text());
+
         $(".addWishlist").click(function() {
             console.log("function called");
             var _prodId = $(this).attr('data-id');
             var _url = '{% url "add_wishlist" %}';
-            var _redirectUrl = '{% url "wishlist" %}';
-
-            console.log(_redirectUrl)
-            console.log(_url)
-            console.log(_prodId)
 
             $.ajax({
                 url:_url,
@@ -19,9 +16,13 @@
                 dataType:'json',
                 success:function(res){
                     if((res.data) == 1 ){
-                        window.location = _redirectUrl;
+                        alertify.set('notifier','position', 'top-right');
+                        alertify.success('Item added to your wishlist.');
+                        wishlist_len++;
+                        $('#wishlist_id').text(wishlist_len);
                     } else {
-                        alert("item already in your wishlist..!");
+                        alertify.set('notifier','position', 'top-right');
+                        alertify.warning('Item already in your wishlist..!');
                     }
                 }
             })
