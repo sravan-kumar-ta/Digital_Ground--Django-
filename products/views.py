@@ -116,14 +116,15 @@ def product_list(request, category_slug):
             pass
 
     # Pagination
-    paginator = Paginator(products, 3)
+    paginator = Paginator(products, 6)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     context.update({
         'category': category,
         'page_obj': page_obj,
-        'brands': brands
+        'brands': brands,
+        'total_pr': products.count()
     })
     return render(request, 'products/category_products.html', context)
 

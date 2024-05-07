@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
 
 {% block content %}
 
@@ -46,8 +47,8 @@
                 <div class="col-lg-9 order-1 order-lg-2 mb-5 mb-lg-0">
                     <div class="row mb-3 align-items-center">
                         <div class="col-lg-6 mb-2 mb-lg-0">
-                            <p class="text-small text-muted mb-0">
-                                Showing Products {{ page_obj.start_index }} to {{ page_obj.end_index }}
+                            <p class="text-small mb-0 font-weight-bold">
+                                Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ total_pr }} products.
                             </p>
                         </div>
                         <!-- Button trigger modal -->
@@ -66,6 +67,7 @@
                             </div>
                         </div>
                     </div>
+                    <hr>
 
                     <div class="row">
 
@@ -81,7 +83,7 @@
 
                                     <a class="d-block" href="{{ product.get_url }}">
                                         {% if product.image %}
-                                        <img class="img-fluid w-100" src="{{product.image.url}}"
+                                        <img class="img-fluid" src="{{product.image.url}}" style="max-height: 130px;"
                                              alt="{{product.title}}">
                                         {% else %}
                                         <img class="img-fluid w-100" src="{% static 'img/product-1.jpg' %}"
@@ -119,7 +121,7 @@
                                 </div>
                                 <h6><a class="reset-anchor" href="#">{{product.title}}</a>
                                 </h6>
-                                <p class="small text-muted">{{product.price}} &#x20B9</p>
+                                <p class="small text-muted">{{product.price|intcomma}} &#x20B9</p>
                             </div>
                         </div>
 
@@ -133,8 +135,9 @@
                         <ul class="pagination justify-content-center">
                             {% if page_obj.has_previous %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;
-                                    Previous</a>
+                                <a class="page-link btn btn-primary" href="?page={{ page_obj.previous_page_number }}">
+                                    &laquo; Previous
+                                </a>
                             </li>
                             {% else %}
                             <li class="page-item disabled">
@@ -149,7 +152,9 @@
 
                             {% if page_obj.has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next &raquo;</a>
+                                <a class="page-link btn btn-primary" href="?page={{ page_obj.next_page_number }}">
+                                    Next &raquo;
+                                </a>
                             </li>
                             {% else %}
                             <li class="page-item disabled">

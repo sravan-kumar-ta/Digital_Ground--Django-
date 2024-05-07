@@ -140,7 +140,8 @@
                     <div class="d-block mb-3 position-relative">
                         <a class="d-block" href="{{ rp.get_url }}">
                             {% if rp.image %}
-                            <img class="img-fluid w-100" src="{{ rp.image.url }}" alt="{{rp.title}}">
+                            <img class="img-fluid" src="{{ rp.image.url }}" alt="{{rp.title}}"
+                                 style="max-height: 180px;">
                             {% else %}
                             <img class="img-fluid w-100" src="{% static 'img/product-1.jpg' %}" alt="{{rp.title}}">
                             {% endif %}

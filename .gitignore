@@ -1,4 +1,6 @@
 venv
 db.sqlite3
+db.sqbpro
 media
 .env
+.idea

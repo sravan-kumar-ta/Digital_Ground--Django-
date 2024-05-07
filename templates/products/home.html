@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
 
 {% block content %}
 
@@ -68,7 +69,8 @@
 
                         <a class="d-block" href="{{ product.get_url }}">
                             {% if product.image %}
-                            <img class="img-fluid w-100" src="{{ product.image.url }}" alt="{{ product.title }}">
+                            <img class="img-fluid" src="{{ product.image.url }}" alt="{{ product.title }}"
+                                 style="max-height: 250px;">
                             {% else %}
                             <img class="img-fluid w-100" src="{% static 'img/cat-img.jpg' %}" alt="{{ product.title }}">
                             {% endif %}
@@ -100,7 +102,7 @@
                         </div>
                     </div>
                     <h6><a class="reset-anchor" href="detail.html">{{ product.title }}</a></h6>
-                    <p class="small text-muted">{{ product.price }} &#x20B9</p>
+                    <p class="small text-muted">{{ product.price|intcomma }} &#x20B9</p>
                 </div>
             </div>
 
