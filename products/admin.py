@@ -10,12 +10,14 @@ class CategoryAdmin(admin.ModelAdmin):
 
 class BrandAdmin(admin.ModelAdmin):
     list_display = ('name', 'category')
+    list_filter = ('category',)
 
 
 class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     list_display = ('id', 'title', 'brand', 'category', 'price', 'stock')
     list_editable = ('price', 'stock')
+    list_filter = ('category',)
 
 
 class CartAdmin(admin.ModelAdmin):
