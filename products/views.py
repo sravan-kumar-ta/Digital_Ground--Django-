@@ -41,13 +41,11 @@ def product_filter(*args, **kwargs):
     sort_method = kwargs['data']['sort_method']
     min_price = kwargs['data']['min_price']
     max_price = kwargs['data']['max_price']
+    category_id = kwargs['data']['cat_id']
     products = args[0]
 
     if len(selected_brands) != 0:
-        selected_brands_objs = list()
-        for brand in selected_brands:
-            selected_brands_objs.append(get_object_or_404(Brand, name=brand))
-        products = products.filter(brand__in=selected_brands_objs)
+        products = products.filter(brand__name__in=selected_brands, brand__category=category_id)
 
     if sort_method:
         if sort_method == '1':
@@ -65,7 +63,7 @@ def product_filter(*args, **kwargs):
 
 def product_list(request, category_slug):
     category = get_object_or_404(Category, slug=category_slug)
-    products = Product.objects.filter(Q(category=category) & Q(stock__gte=1))
+    products = Product.objects.filter(category=category, stock__gte=1)
     brands = Brand.objects.filter(category=category)
     category_id = category.id
 
@@ -89,7 +87,6 @@ def product_list(request, category_slug):
 
         # filtering the products
         products = product_filter(products, data=prod_filter)
-
         request.session['prod_filter'] = prod_filter
 
     # this block is used to filter the data when pagination is occurs...(when changing pages)
