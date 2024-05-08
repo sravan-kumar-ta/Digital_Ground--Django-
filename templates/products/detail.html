@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load humanize %}
 
 {% block content %}
 
@@ -58,7 +59,7 @@
             <!-- PRODUCT DETAILS-->
             <div class="col-lg-6">
                 <h1>{{ product.title }}</h1>
-                <p class="text-muted lead">{{ product.price }} &#x20B9</p>
+                <p class="text-muted lead">{{ product.price|intcomma }} &#x20B9</p>
                 <p class="text-small mb-4">{{ product.description }}</p>
 
                 <div class="row align-items-stretch mb-4">
@@ -192,6 +193,7 @@
             $("#quantity").val((_qty)-1);
         });
     });
+
 </script>
 {% endblock content %}
 

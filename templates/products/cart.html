@@ -39,13 +39,13 @@
                             <th class="border-0" scope="col">
                                 <strong class="text-small text-uppercase">Product</strong>
                             </th>
-                            <th class="border-0" scope="col">
+                            <th class="border-0 text-center" scope="col">
                                 <strong class="text-small text-uppercase">Price</strong>
                             </th>
-                            <th class="border-0" scope="col">
+                            <th class="border-0 text-center" scope="col">
                                 <strong class="text-small text-uppercase">Quantity</strong>
                             </th>
-                            <th class="border-0" scope="col">
+                            <th class="border-0 text-center" scope="col">
                                 <strong class="text-small text-uppercase">Total</strong>
                             </th>
                             <th class="border-0" scope="col"></th>
@@ -78,7 +78,8 @@
 
                                     <div class="media-body ml-3">
                                         <strong class="h6">
-                                            <a class="reset-anchor animsition-link" href="{{ cart_product.get_url }}">
+                                            <a class="reset-anchor animsition-link" href="{{ cart_product.get_url }}"
+                                            style="max-width: 5ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">
                                                 {{cart_product.product.title}}
                                             </a>
                                         </strong>
@@ -86,14 +87,14 @@
                                 </div>
                             </th>
                             <td class="align-middle border-0">
-                                <p class="mb-0 small">{{cart_product.product.price}} &#x20B9</p>
+                                <p class="mb-0 small">{{cart_product.product.price|intcomma}} &#x20B9</p>
                             </td>
                             <td class="align-middle border-0">
-                                <div class="border d-flex align-items-center justify-content-between px-3">
-                                    <span class="small text-uppercase text-gray headings-font-family">Quantity</span>
+                                <div class="d-flex align-items-center justify-content-center">
                                     <div class="quantity">
 
-                                        <form action="{% url 'products:minus_from_cart' %}" method="post">
+                                        <form action="{% url 'products:minus_from_cart' %}" method="post"
+                                              class="btn-light px-2 rounded">
                                             {% csrf_token %}
                                             <input type="hidden" name="prod_id" value="{{ cart_product.product.id }}">
                                             <button type="submit" class="p-0 text-primary">
@@ -104,7 +105,8 @@
                                         <input class="form-control form-control-sm border-0 shadow-0 p-0"
                                                type="text" value="{{ cart_product.qty }}"/>
 
-                                        <form action="{% url 'products:add_to_cart' %}" method="post">
+                                        <form action="{% url 'products:add_to_cart' %}" method="post"
+                                              class="btn-light px-2 rounded">
                                             {% csrf_token %}
                                             <input type="hidden" name="prod_id" value="{{ cart_product.product.id }}">
                                             <button type="submit" class="p-0 text-primary">
@@ -116,7 +118,9 @@
                                 </div>
                             </td>
                             <td class="align-middle border-0">
-                                <p class="mb-0 small">{{ cart_product.total|floatformat:2|intcomma }} &#x20B9</p>
+                                <p class="mb-0 small font-weight-bold">
+                                    {{ cart_product.total|floatformat:2|intcomma }} &#x20B9
+                                </p>
                             </td>
                             <td class="align-middle border-0">
                                 <a class="reset-anchor"

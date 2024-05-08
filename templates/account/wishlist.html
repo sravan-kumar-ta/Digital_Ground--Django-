@@ -38,16 +38,16 @@
                             <th class="border-0" scope="col">
                                 <strong class="text-small text-uppercase">Product</strong>
                             </th>
-                            <th class="border-0" scope="col">
+                            <th class="border-0 text-center" scope="col">
                                 <strong class="text-small text-uppercase">Brand</strong>
                             </th>
-                            <th class="border-0" scope="col">
+                            <th class="border-0 text-center" scope="col">
                                 <strong class="text-small text-uppercase">Price</strong>
                             </th>
-                            <th class="border-0" scope="col">
+                            <th class="border-0 text-center" scope="col">
                                 <strong class="text-small text-uppercase">Add to cart</strong>
                             </th>
-                            <th class="border-0" scope="col">
+                            <th class="border-0 text-center" scope="col">
                                 <strong class="text-small text-uppercase">Remove</strong>
                             </th>
                         </tr>
@@ -76,13 +76,13 @@
                                     </div>
                                 </div>
                             </th>
-                            <td class="align-middle border-0">
+                            <td class="align-middle border-0 text-center">
                                 <p class="mb-0 small">{{ item.product.brand }}</p>
                             </td>
-                            <td class="align-middle border-0">
-                                <p class="mb-0 small">{{ item.product.price }} &#x20B9</p>
+                            <td class="align-middle border-0 text-center">
+                                <p class="mb-0 small">{{ item.product.price|intcomma }} &#x20B9</p>
                             </td>
-                            <td class="align-middle border-0">
+                            <td class="align-middle border-0 text-center">
                                 <form action="{% url 'products:add_to_cart' %}" method="post">
                                     {% csrf_token %}
                                     <input type="hidden" name="prod_id" value="{{ item.product.id }}" id="product_id">
@@ -91,7 +91,7 @@
                                     </button>
                                 </form>
                             </td>
-                            <td class="align-middle border-0">
+                            <td class="align-middle border-0 text-center">
                                 <a class="reset-anchor" href="{% url 'del_wishlist' item.product.id %}">
                                     <i class="fas fa-trash-alt small text-muted"></i>
                                 </a>
