@@ -181,20 +181,6 @@
 </section>
 
 <script src="{% static 'jquery.min.js' %}"></script>
-<script>
-    $(document).ready(function(){
-        $("#quantity").val($("#inputQty").val());
-        $("#plus").on('click',function(){
-            var _qty = parseInt($("#inputQty").val())
-            $("#quantity").val((_qty)+1);
-        });
-        $("#minus").on('click',function(){
-            var _qty = parseInt($("#inputQty").val())
-            $("#quantity").val((_qty)-1);
-        });
-    });
-
-</script>
 {% endblock content %}
 
 {% block script %}
