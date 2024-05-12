@@ -25,7 +25,7 @@
     </section>
 
     {% if cart_products %}
-    <section class="py-5">
+    <section class="py-5" id="product-div">
         <h2 class="h5 text-uppercase mb-4">Shopping cart</h2>
 
         <div class="row">
@@ -54,9 +54,9 @@
 
                         <tbody>
                         {% for cart_product in cart_products.cart_obj %}
-                        <tr>
+                        <tr id="product_row_{{ cart_product.product.id }}" class="product-row">
                             <td class="align-middle border-0">
-                                <strong class="mb-0">{{ forloop.counter }}</strong>
+                                <strong class="mb-0 row-number">{{ forloop.counter }}</strong>
                             </td>
                             <th class="pl-0 border-0" scope="row">
                                 <div class="media align-items-center">
@@ -78,55 +78,50 @@
 
                                     <div class="media-body ml-3">
                                         <strong class="h6">
-                                            <a class="reset-anchor animsition-link" href="{{ cart_product.get_url }}"
-                                            style="max-width: 5ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">
-                                                {{cart_product.product.title}}
+                                            <a class="reset-anchor animsition-link" href="{{ cart_product.product.get_url }}"
+                                            style="max-width: 5ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap"
+                                            data-toggle="tooltip" data-placement="top" title="{{cart_product.product.title}}">
+                                                {{cart_product.product.title|slice:":15"}}...
                                             </a>
                                         </strong>
                                     </div>
                                 </div>
                             </th>
                             <td class="align-middle border-0">
-                                <p class="mb-0 small">{{cart_product.product.price|intcomma}} &#x20B9</p>
+                                <p class="mb-0 small">{{cart_product.product.price|intcomma}}&nbsp&#x20B9</p>
                             </td>
                             <td class="align-middle border-0">
                                 <div class="d-flex align-items-center justify-content-center">
                                     <div class="quantity">
+                                        <button class="minus-from-cart p-0 text-primary" data-prod-id="{{ cart_product.product.id }}">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
 
-                                        <form action="{% url 'products:minus_from_cart' %}" method="post"
-                                              class="btn-light px-2 rounded">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="prod_id" value="{{ cart_product.product.id }}">
-                                            <button type="submit" class="p-0 text-primary">
-                                                <i class="fas fa-minus"></i>
-                                            </button>
-                                        </form>
+                                        <p class="mb-0 small mx-2" id="product_{{ cart_product.product.id }}">
+                                            {{ cart_product.qty }}
+                                        </p>
 
-                                        <input class="form-control form-control-sm border-0 shadow-0 p-0"
-                                               type="text" value="{{ cart_product.qty }}"/>
-
-                                        <form action="{% url 'products:add_to_cart' %}" method="post"
-                                              class="btn-light px-2 rounded">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="prod_id" value="{{ cart_product.product.id }}">
-                                            <button type="submit" class="p-0 text-primary">
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                        </form>
-
+                                        <button class="add-to-cart p-0 text-primary" data-prod-id="{{ cart_product.product.id }}">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </td>
                             <td class="align-middle border-0">
-                                <p class="mb-0 small font-weight-bold">
-                                    {{ cart_product.total|floatformat:2|intcomma }} &#x20B9
+                                <p class="mb-0 small font-weight-bold" id="product_total_{{ cart_product.product.id }}">
+                                    {{ cart_product.total|floatformat:2|intcomma }}&nbsp&#x20B9
                                 </p>
                             </td>
                             <td class="align-middle border-0">
+                                {% comment %}
                                 <a class="reset-anchor"
                                    href="{% url 'products:remove_from_cart' cart_product.product.id %}">
                                     <i class="fas fa-trash-alt small text-muted"></i>
                                 </a>
+                                {% endcomment %}
+                                <button class="btn delete-from-cart p-0 text-primary" data-prod-id="{{ cart_product.product.id }}">
+                                    <i class="fas fa-trash-alt small text-muted"></i>
+                                </button>
                             </td>
                         </tr>
                         {% endfor %}
@@ -154,32 +149,34 @@
                         <ul class="list-unstyled">
                             <li class="d-flex align-items-center justify-content-between">
                                 <strong class="text-uppercase small font-weight-bold">Subtotal</strong>
-                                <span class="text-muted small">
+                                <span class="text-muted small" id="sb-total">
                                     {{ cart_products.total_price|floatformat:2|intcomma }}
                                 </span>
                             </li>
                             <li class="d-flex align-items-center justify-content-between">
                                 <strong class="text-uppercase small font-weight-bold">Shipping Charge</strong>
-                                <span class="text-muted small">
+                                <span class="text-muted small" id="sp-charge">
                                     + {{ cart_products.shipping_charge|floatformat:2|intcomma }}
                                 </span>
                             </li>
                             <li class="d-flex align-items-center justify-content-between">
                                 <strong class="text-uppercase small font-weight-bold">Tax</strong>
-                                <span class="text-muted small">
+                                <span class="text-muted small" id="tax">
                                     + {{ cart_products.tax|floatformat:2|intcomma }}
                                 </span>
                             </li>
                             <li class="d-flex align-items-center justify-content-between">
                                 <strong class="text-uppercase small font-weight-bold">Discount</strong>
-                                <span class="text-muted small">
+                                <span class="text-muted small" id="discount">
                                     - {{ cart_products.discount|floatformat:2|intcomma }}
                                 </span>
                             </li>
                             <li class="border-bottom my-2"></li>
                             <li class="d-flex align-items-center justify-content-between mb-4">
                                 <strong class="text-uppercase small font-weight-bold">Total</strong>
-                                <strong>{{ cart_products.grand_total|floatformat:2|intcomma }} &#x20B9</strong>
+                                <strong id="grand-total">
+                                    {{ cart_products.grand_total|floatformat:2|intcomma }} &#x20B9
+                                </strong>
                             </li>
                         </ul>
 
@@ -237,22 +234,14 @@
     </div>
 
     {% endif %}
+    <div class="text-center py-5" id="no-product" style="display: none;">
+        <h3 class="mb-3">Your cart is empty.</h3>
+        <a href="{% url 'products:category' %}"><i class="fas fa-long-arrow-alt-left mr-2"> </i>Continue shopping</a>
+    </div>
 
 </div>
 {% endblock content %}
 
 {% block script %}
-<script>
-$(document).ready(function(){
-    $("#checkout").on('click',function(e){
-
-        if( !$('.address').is(':checked') ) {
-            e.preventDefault();
-            alert("Please select an address for checkout this order.!");
-        }
-
-    });
-});
-
-</script>
+{% include 'partials/add_wishlist.html' %}
 {% endblock script %}

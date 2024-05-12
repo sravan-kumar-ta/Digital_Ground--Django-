@@ -84,7 +84,6 @@
                     <div class="col-sm-3 pl-sm-0">
                         {% comment %}
                         <a href="{% url 'products:add-to-cart' product.id %}"> Add to cart </a>
-                        {% endcomment %}
 
                         <form action="{% url 'products:add_to_cart' %}" method="post">
                             {% csrf_token %}
@@ -95,6 +94,12 @@
                                 Add to Cart
                             </button>
                         </form>
+                        {% endcomment %}
+
+                        <button class="add-to-cart btn btn-dark btn-lg btn-block h-100 d-flex align-items-center justify-content-center px-0"
+                                data-prod-id="{{ product.id }}">
+                            Add to Cart
+                        </button>
 
                     </div>
 
@@ -156,6 +161,7 @@
                                     </a>
                                 </li>
                                 <li class="list-inline-item m-0 p-0">
+                                    {% comment %}
                                     <form action="{% url 'products:add_to_cart' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="prod_id" value="{{ rp.id }}">
@@ -163,6 +169,11 @@
                                             Add to Cart
                                         </button>
                                     </form>
+                                    {% endcomment %}
+
+                                    <button class="add-to-cart btn btn-sm btn-dark" data-prod-id="{{ rp.id }}">
+                                        Add to Cart
+                                    </button>
                                 </li>
                             </ul>
                         </div>

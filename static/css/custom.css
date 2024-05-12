@@ -1,1 +1,10 @@
 /* your styles go here */
+.tooltip-inner {
+    background-color: #117a8b; /* background */
+}
+.tooltip-inner {
+    color: #ffffff; /* text */
+}
+.tooltip .arrow::before {
+    border-top-color: #117a8b; /* arrow */
+}

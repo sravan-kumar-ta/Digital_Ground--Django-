@@ -89,14 +89,16 @@
                                     {% comment %}
                                     <a class="btn btn-sm btn-dark" href="#">
                                         Add to cart</a>
-                                    {% endcomment %}
 
                                     <form action="{% url 'products:add_to_cart' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="prod_id" value="{{product.id}}" id="product_id">
                                         <button type="submit" class="btn btn-sm btn-dark">Add to Cart</button>
                                     </form>
-
+                                    {% endcomment %}
+                                    <button class="add-to-cart btn btn-sm btn-dark" data-prod-id="{{ product.id }}">
+                                        Add to Cart
+                                    </button>
                                 </li>
                             </ul>
                         </div>

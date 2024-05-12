@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import TemplateView, ListView
 
@@ -174,7 +175,6 @@ def cart(request):
                 }
                 total_price += total
                 cart_obj.append(temp)
-                print(cart_obj)
 
             request.session['cart_length'] = len(request.session['cart'])
 
@@ -196,80 +196,148 @@ def cart(request):
     return render(request, 'products/cart.html', {'cart_products': context})
 
 
+def total_price(price):
+    tax = price * 3 / 100  # 3% tax
+    shipping_charge = 40
+    discount = price * 2 / 100  # 2% discount
+    grand_total = price + tax + shipping_charge - discount
+    context = {
+        "sub_total": round(price, 2),
+        "tax": round(tax, 2),
+        "shipping_charge": round(shipping_charge, 2),
+        "discount": round(discount, 2),
+        "grand_total": round(grand_total, 2)
+    }
+    return context
+
+
 def add_to_cart(request):
-    prod_id = request.POST['prod_id']
-    try:
-        qty = request.POST['quantity']
-    except:
-        qty = 1
+    prod_id = request.GET.get('prod_id')
+    qty = int(request.GET.get('quantity', 1))
+    product = get_object_or_404(Product, id=prod_id)
+    context = {}
 
     if request.user.is_authenticated:
-        product = get_object_or_404(Product, id=prod_id)
-        if Cart.objects.filter(product=prod_id, user=request.user).exists():
-            item = Cart.objects.get(product=prod_id, user=request.user)
-            item.quantity += int(qty)
-        else:
-            item = Cart.objects.create(
-                product=product,
-                user=request.user,
-                quantity=int(qty)
-            )
+        item, created = Cart.objects.get_or_create(
+            product=product,
+            user=request.user
+        )
+        item.quantity += qty
+        qty = item.quantity
         item.save()
+        price = item.item_total()
+
+        total_prz = 0
+        products = Cart.objects.filter(user=request.user)
+        for i in products:
+            total = int(i.item_total())
+            total_prz += total
+
+        context = total_price(total_prz)
 
     else:
-        item = dict()
-        item[prod_id] = {
-            'qty': qty
-        }
+        session_cart = request.session.get('cart', {})
+        session_cart[prod_id] = {'qty': session_cart.get(prod_id, {'qty': 0})['qty'] + qty}
+        qty = session_cart[prod_id]['qty']
+        request.session['cart'] = session_cart
+        price = product.price * qty
 
-        if 'cart' in request.session:
-            session_cart = request.session['cart']
-            if prod_id in request.session['cart']:
-                qty_in_session = int(session_cart[prod_id]['qty'])
-                session_cart[prod_id]['qty'] = qty_in_session + int(qty)
-                request.session['cart'] = session_cart
-            else:
-                session_cart.update(item)
-                request.session['cart'] = session_cart
-        else:
-            request.session['cart'] = item
+        total_prz = 0
+        for i in session_cart:
+            item = session_cart[i]
+            product = get_object_or_404(Product, id=i)
+            quantity = item['qty']
+            total = product.price * int(quantity)
+            total_prz += total
 
-        request.session['cart_length'] = len(request.session['cart'])
+        context = total_price(total_prz)
 
-    messages.success(request, 'Item added to the cart.')
-    return redirect('products:cart')
+    context.update({"prod_id": prod_id, "qty": qty, "price": price})
+
+    return JsonResponse(context)
 
 
 def minus_from_cart(request):
+    prod_id = request.GET['prod_id']
+    product = get_object_or_404(Product, id=prod_id)
+    qty = price = 0
+    context = {}
     try:
-        prod_id = request.POST['prod_id']
         if request.user.is_authenticated:
             item = Cart.objects.get(product=prod_id, user=request.user)
             item.quantity -= 1
+            qty = item.quantity
             item.save()
+            price = item.item_total()
             if item.quantity < 1:
                 item.delete()
+                price = 0
+
+            total_prz = 0
+            products = Cart.objects.filter(user=request.user)
+            for i in products:
+                total = int(i.item_total())
+                total_prz += total
+
+            context = total_price(total_prz)
 
         else:
             session_cart = request.session['cart']
             qty_in_session = int(session_cart[prod_id]['qty'])
+            # session_cart[prod_id] = {'qty': qty_in_session - 1}
             session_cart[prod_id]['qty'] = qty_in_session - 1
+            qty = session_cart[prod_id]['qty']
+            price = product.price * qty
             if session_cart[prod_id]['qty'] < 1:
                 del session_cart[prod_id]
+                price = 0
             request.session['cart'] = session_cart
+
+            total_prz = 0
+            for i in session_cart:
+                item = session_cart[i]
+                product = get_object_or_404(Product, id=i)
+                quantity = item['qty']
+                total = product.price * int(quantity)
+                total_prz += total
+
+            context = total_price(total_prz)
     except:
         pass
 
-    return redirect('products:cart')
+    context.update({"prod_id": prod_id, "qty": qty, "price": price})
+
+    return JsonResponse(context)
 
 
-def remove_from_cart(request, p_id):
+def remove_from_cart(request):
+    prod_id = request.GET['prod_id']
     if request.user.is_authenticated:
-        item = Cart.objects.get(product=p_id, user=request.user)
+        item = Cart.objects.get(product=prod_id, user=request.user)
         item.delete()
+
+        total_prz = 0
+        products = Cart.objects.filter(user=request.user)
+        for i in products:
+            total = int(i.item_total())
+            total_prz += total
+
+        context = total_price(total_prz)
     else:
         session_cart = request.session['cart']
-        del session_cart[p_id]
+        del session_cart[prod_id]
         request.session['cart'] = session_cart
-    messages.error(request, 'Item remove from your cart.')
-    return redirect('products:cart')
+
+        total_prz = 0
+        for i in session_cart:
+            item = session_cart[i]
+            product = get_object_or_404(Product, id=i)
+            quantity = item['qty']
+            total = product.price * int(quantity)
+            total_prz += total
+
+        context = total_price(total_prz)
+
+    context.update({"prod_id": prod_id})
+
+    return JsonResponse(context)

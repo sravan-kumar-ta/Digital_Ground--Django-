@@ -49,7 +49,7 @@ class Product(models.Model):
 class Cart(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    quantity = models.IntegerField()
+    quantity = models.IntegerField(default=0)
     updated_at = models.DateTimeField(auto_now=True)
 
     def item_total(self):
