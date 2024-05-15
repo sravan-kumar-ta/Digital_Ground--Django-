@@ -1,8 +1,7 @@
-from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404
 from django.views.generic import TemplateView, ListView
 
 from account.models import Address
@@ -138,206 +137,116 @@ def details_of_product(request, c_slug, p_slug):
     return render(request, 'products/detail.html', context)
 
 
-def cart(request):
-    cart_obj = list()
-    total_price = 0
-    context = {}
+def get_cart_context(request):
+    cart_obj = []
+    if request.user.is_authenticated:
+        cart_items = Cart.objects.filter(user=request.user)
+        addresses = Address.objects.filter(user=request.user)
+        for item in cart_items:
+            cart_obj.append({
+                'product': item.product,
+                'qty': item.quantity,
+                'total': item.item_total()
+            })
+    else:
+        session_cart = request.session.get('cart', {})
+        product_ids = session_cart.keys()
+        products = Product.objects.filter(id__in=product_ids)
+        for product in products:
+            qty = session_cart[str(product.id)]['qty']
+            total = product.price * qty
+            cart_obj.append({
+                'product': product,
+                'qty': qty,
+                'total': total
+            })
+
+    sub_total = float(sum(item['total'] for item in cart_obj))
+    shipping_charge = 40
+    tax = sub_total * 0.03  # 3% tax
+    discount = sub_total * 0.02  # 2% discount
+    grand_total = sub_total + tax + shipping_charge - discount
+
+    context = {
+        'cart_obj': cart_obj,
+        'sub_total': sub_total,
+        'shipping_charge': shipping_charge,
+        'tax': tax,
+        'discount': discount,
+        'grand_total': grand_total
+    }
 
     if request.user.is_authenticated:
-        products = Cart.objects.filter(user=request.user)
-        for i in products:
-            total = int(i.item_total())
-            product = get_object_or_404(Product, id=i.product.id)
-            temp = {
-                'product': product,
-                'qty': i.quantity,
-                'total': total
-            }
-            total_price += total
-            cart_obj.append(temp)
-        request.session['cart_length'] = Cart.objects.filter(user=request.user).count()
-        addresses = Address.objects.filter(user=request.user)
-        context = {'addresses': addresses}
-
-    else:
-        # request.session.flush()
-        if 'cart' in request.session:
-            session_cart = request.session['cart']
-            for i in session_cart:
-                item = session_cart[i]
-                product = get_object_or_404(Product, id=i)
-                quantity = item['qty']
-                total = product.price * int(quantity)
-                temp = {
-                    'product': product,
-                    'qty': quantity,
-                    'total': total
-                }
-                total_price += total
-                cart_obj.append(temp)
-
-            request.session['cart_length'] = len(request.session['cart'])
-
-    if len(cart_obj) < 1:
-        context = None
-    else:
-        tax = total_price * 3 / 100  # 3% tax
-        shipping_charge = 40
-        discount = total_price * 2 / 100  # 2% discount
-        grand_total = total_price + tax + shipping_charge - discount
-
-        context['cart_obj'] = cart_obj
-        context['total_price'] = total_price
-        context['tax'] = tax
-        context['shipping_charge'] = shipping_charge
-        context['discount'] = discount
-        context['grand_total'] = grand_total
-
-    return render(request, 'products/cart.html', {'cart_products': context})
-
-
-def total_price(price):
-    tax = price * 3 / 100  # 3% tax
-    shipping_charge = 40
-    discount = price * 2 / 100  # 2% discount
-    grand_total = price + tax + shipping_charge - discount
-    context = {
-        "sub_total": round(price, 2),
-        "tax": round(tax, 2),
-        "shipping_charge": round(shipping_charge, 2),
-        "discount": round(discount, 2),
-        "grand_total": round(grand_total, 2)
-    }
+        context['addresses'] = addresses
     return context
+
+
+def cart(request):
+    return render(request, 'products/cart.html', {'cart_products': get_cart_context(request)})
+
+
+def update_cart_context(request, prod_id):
+    context = get_cart_context(request)
+    product = get_object_or_404(Product, id=prod_id)
+    qty = next((item['qty'] for item in context['cart_obj'] if item['product'].id == int(prod_id)), 0)
+    price = product.price * qty
+
+    context.update({
+        "prod_id": prod_id,
+        "qty": qty,
+        "price": price
+    })
+    context.pop('cart_obj')
+    context.pop('addresses')
+    return context
+
+
+def modify_cart(request, prod_id, qty_change):
+    product = get_object_or_404(Product, id=prod_id)
+    if request.user.is_authenticated:
+        item, created = Cart.objects.get_or_create(product=product, user=request.user)
+        item.quantity += qty_change
+        if item.quantity <= 0:
+            item.delete()
+        else:
+            item.save()
+    else:
+        session_cart = request.session.get('cart', {})
+        if prod_id in session_cart:
+            session_cart[prod_id]['qty'] += qty_change
+            if session_cart[prod_id]['qty'] <= 0:
+                del session_cart[prod_id]
+        else:
+            if qty_change > 0:
+                session_cart[prod_id] = {'qty': qty_change}
+        request.session['cart'] = session_cart
+
+    context = update_cart_context(request, prod_id)
+    return JsonResponse(context)
 
 
 def add_to_cart(request):
     prod_id = request.GET.get('prod_id')
     qty = int(request.GET.get('quantity', 1))
-    product = get_object_or_404(Product, id=prod_id)
-    context = {}
-
-    if request.user.is_authenticated:
-        item, created = Cart.objects.get_or_create(
-            product=product,
-            user=request.user
-        )
-        item.quantity += qty
-        qty = item.quantity
-        item.save()
-        price = item.item_total()
-
-        total_prz = 0
-        products = Cart.objects.filter(user=request.user)
-        for i in products:
-            total = int(i.item_total())
-            total_prz += total
-
-        context = total_price(total_prz)
-
-    else:
-        session_cart = request.session.get('cart', {})
-        session_cart[prod_id] = {'qty': session_cart.get(prod_id, {'qty': 0})['qty'] + qty}
-        qty = session_cart[prod_id]['qty']
-        request.session['cart'] = session_cart
-        price = product.price * qty
-
-        total_prz = 0
-        for i in session_cart:
-            item = session_cart[i]
-            product = get_object_or_404(Product, id=i)
-            quantity = item['qty']
-            total = product.price * int(quantity)
-            total_prz += total
-
-        context = total_price(total_prz)
-
-    context.update({"prod_id": prod_id, "qty": qty, "price": price})
-
-    return JsonResponse(context)
+    return modify_cart(request, prod_id, qty)
 
 
 def minus_from_cart(request):
-    prod_id = request.GET['prod_id']
-    product = get_object_or_404(Product, id=prod_id)
-    qty = price = 0
-    context = {}
-    try:
-        if request.user.is_authenticated:
-            item = Cart.objects.get(product=prod_id, user=request.user)
-            item.quantity -= 1
-            qty = item.quantity
-            item.save()
-            price = item.item_total()
-            if item.quantity < 1:
-                item.delete()
-                price = 0
-
-            total_prz = 0
-            products = Cart.objects.filter(user=request.user)
-            for i in products:
-                total = int(i.item_total())
-                total_prz += total
-
-            context = total_price(total_prz)
-
-        else:
-            session_cart = request.session['cart']
-            qty_in_session = int(session_cart[prod_id]['qty'])
-            # session_cart[prod_id] = {'qty': qty_in_session - 1}
-            session_cart[prod_id]['qty'] = qty_in_session - 1
-            qty = session_cart[prod_id]['qty']
-            price = product.price * qty
-            if session_cart[prod_id]['qty'] < 1:
-                del session_cart[prod_id]
-                price = 0
-            request.session['cart'] = session_cart
-
-            total_prz = 0
-            for i in session_cart:
-                item = session_cart[i]
-                product = get_object_or_404(Product, id=i)
-                quantity = item['qty']
-                total = product.price * int(quantity)
-                total_prz += total
-
-            context = total_price(total_prz)
-    except:
-        pass
-
-    context.update({"prod_id": prod_id, "qty": qty, "price": price})
-
-    return JsonResponse(context)
+    prod_id = request.GET.get('prod_id')
+    return modify_cart(request, prod_id, -1)
 
 
 def remove_from_cart(request):
-    prod_id = request.GET['prod_id']
+    prod_id = request.GET.get('prod_id')
+    product = get_object_or_404(Product, id=prod_id)
+
     if request.user.is_authenticated:
-        item = Cart.objects.get(product=prod_id, user=request.user)
-        item.delete()
-
-        total_prz = 0
-        products = Cart.objects.filter(user=request.user)
-        for i in products:
-            total = int(i.item_total())
-            total_prz += total
-
-        context = total_price(total_prz)
+        Cart.objects.filter(product=product, user=request.user).delete()
     else:
-        session_cart = request.session['cart']
-        del session_cart[prod_id]
-        request.session['cart'] = session_cart
+        session_cart = request.session.get('cart', {})
+        if prod_id in session_cart:
+            del session_cart[prod_id]
+            request.session['cart'] = session_cart
 
-        total_prz = 0
-        for i in session_cart:
-            item = session_cart[i]
-            product = get_object_or_404(Product, id=i)
-            quantity = item['qty']
-            total = product.price * int(quantity)
-            total_prz += total
-
-        context = total_price(total_prz)
-
-    context.update({"prod_id": prod_id})
-
+    context = update_cart_context(request, prod_id)
     return JsonResponse(context)
