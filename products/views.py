@@ -140,7 +140,7 @@ def details_of_product(request, c_slug, p_slug):
 def get_cart_context(request):
     cart_obj = []
     if request.user.is_authenticated:
-        cart_items = Cart.objects.filter(user=request.user)
+        cart_items = Cart.objects.filter(user=request.user).order_by('-id')
         addresses = Address.objects.filter(user=request.user)
         for item in cart_items:
             cart_obj.append({
@@ -196,8 +196,8 @@ def update_cart_context(request, prod_id):
         "qty": qty,
         "price": price
     })
-    context.pop('cart_obj')
-    context.pop('addresses')
+    context.pop('cart_obj', None)
+    context.pop('addresses', None)
     return context
 
 
