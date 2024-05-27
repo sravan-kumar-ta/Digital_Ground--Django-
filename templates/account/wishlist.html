@@ -83,13 +83,9 @@
                                 <p class="mb-0 small">{{ item.product.price|intcomma }} &#x20B9</p>
                             </td>
                             <td class="align-middle border-0 text-center">
-                                <form action="{% url 'products:add_to_cart' %}" method="post">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="prod_id" value="{{ item.product.id }}" id="product_id">
-                                    <button type="submit" class="btn">
-                                        <i class="fas fa-cart-arrow-down text-muted"></i>
-                                    </button>
-                                </form>
+                                <button class="add-to-cart btn" data-prod-id="{{ item.product.id }}">
+                                    <i class="fas fa-cart-arrow-down text-muted"></i>
+                                </button>
                             </td>
                             <td class="align-middle border-0 text-center">
                                 <a class="reset-anchor" href="{% url 'del_wishlist' item.product.id %}">
@@ -129,3 +125,7 @@
 
 </div>
 {% endblock content %}
+
+{% block script %}
+{% include 'partials/add_wishlist.html' %}
+{% endblock script %}

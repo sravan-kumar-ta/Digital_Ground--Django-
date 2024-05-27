@@ -141,7 +141,8 @@ def get_cart_context(request):
     cart_obj = []
     if request.user.is_authenticated:
         cart_items = Cart.objects.filter(user=request.user).order_by('-id')
-        addresses = Address.objects.filter(user=request.user)
+        cart_length = cart_items.count()
+        addresses = Address.objects.filter(user=request.user, is_available=True)
         for item in cart_items:
             cart_obj.append({
                 'product': item.product,
@@ -150,6 +151,7 @@ def get_cart_context(request):
             })
     else:
         session_cart = request.session.get('cart', {})
+        cart_length = len(session_cart)
         product_ids = session_cart.keys()
         products = Product.objects.filter(id__in=product_ids)
         for product in products:
@@ -169,6 +171,7 @@ def get_cart_context(request):
 
     context = {
         'cart_obj': cart_obj,
+        'cart_length': cart_length,
         'sub_total': sub_total,
         'shipping_charge': shipping_charge,
         'tax': tax,

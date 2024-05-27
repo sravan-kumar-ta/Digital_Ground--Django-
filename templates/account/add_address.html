@@ -99,7 +99,7 @@ $(document).ready(function(){
             },
             error: function(){
                 $("#pinAlert").hide();
-                alert("Enter a valid PIN Code.")
+                alertify.alert('PIN Code Error', 'Enter a valid PIN Code..!');
                 $(".form-control").removeAttr('disabled');
             }
         })
