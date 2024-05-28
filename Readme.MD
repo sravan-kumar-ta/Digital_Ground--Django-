@@ -1,23 +1,24 @@
 # Digital Ground
-[![Up to Date](https://github.com/ikatyang/emoji-cheat-sheet/workflows/Up%20to%20Date/badge.svg)](https://github.com/ikatyang/emoji-cheat-sheet/actions?query=workflow%3A%22Up+to+Date%22)
-
 >This is a light-weight e-commerce application built on **Python Django**.
 
 ### In this project...:
-* ***Twilio** OTP verification*
-* ***Razorpay** payment gateway*
-* *Purchase-invoice as **PDF**<small>(view and download)</small>*
-* **Third party API integration** to get exact location via PIN Code
-* *Add to cart even without login*
-* *Reset password with email*
-* *PostgreSQL*
-* *Product filtering and sorting through **Ajax** with **pagination***
-* *Wishlist feature for users with **Ajax** requests and messages using [AlertifyJS](https://alertifyjs.com/).*
-* *Customized admin panel with [AdminLTE](https://django-jazzmin.readthedocs.io/)*
+* ***Twilio OTP Verification**: Secure user authentication via One-Time Password (OTP) using Twilio.*
+* ***Razorpay Payment Gateway**: Seamless payment processing integrated with Razorpay.*
+* ***Invoice Management**: Generate and download purchase invoices as PDFs.<small>(view and download)</small>*
+* ***Location Services**: Retrieve exact location details using third-party APIs based on PIN code.*
+* **Cart Functionality**:
+  * *Uses AJAX for seamless user experience without page reloads.*
+  * *Operates without user login.*
+* ***Password Reset**:Reset passwords via email.*
+* ***Product Filtering and Sorting**: AJAX-powered filtering, sorting, and pagination for products.*
+* ***Wishlist**: AJAX-based wishlist management with [AlertifyJS](https://alertifyjs.com/) notifications.*
+* ***Admin Panel**: Customizable admin interface using [AdminLTE](https://django-jazzmin.readthedocs.io/).*
+* ***Database**: PostgreSQL for robust data management.*
 <br>
 
 ## Live Demonstration
 
+* ### Live Link  -> [View 📺](https://digitalground.pythonanywhere.com/)
 * ### Screen Casting  -> [View 📺](https://www.linkedin.com/posts/sravankumarta_django-webdevelopment-djangodeveloper-activity-7020838489688596480-MPq7?utm_source=share&utm_medium=member_desktop)
 <br>
 
@@ -25,8 +26,8 @@
 
 * Clone this repo :
   ```
-  git clone https://github.com/sravan-kumar-ta/Digi_Ground-ecommerce-Django.git
-  cd Digi_Ground-ecommerce-Django
+  git clone https://github.com/sravan-kumar-ta/Digital_Ground--Django-.git
+  cd Digital_Ground--Django-
   ```
 * Create a virtual environment to install dependencies in and activate it:
 
