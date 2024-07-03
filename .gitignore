@@ -10,3 +10,4 @@ orders/migrations
 orders/__pycache__
 products/migrations
 products/__pycache__
+core_folder/__pycache__
