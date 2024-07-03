@@ -4,3 +4,9 @@ db.sqbpro
 media
 .env
 .idea
+account/migrations
+account/__pycache__
+orders/migrations
+orders/__pycache__
+products/migrations
+products/__pycache__
