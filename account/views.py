@@ -37,9 +37,13 @@ class LoginView(FormView):
         if user:
             if not user.is_active:
                 self.request.session['phone_number'] = user.phone_number
-                messages.error(self.request, "You have not activated your account.")
-                messages.success(self.request, "OTP sent your phone number")
-                _send_otp(user.phone_number)
+                try:
+                    _send_otp(user.phone_number)
+                    messages.error(self.request, "You have not activated your account.")
+                    messages.success(self.request, "OTP sent your phone number")
+                except:
+                    messages.error(self.request, "Server issue. Please try again later.")
+                    return redirect('login')
                 return redirect('verify')
 
             if 'cart' in self.request.session:

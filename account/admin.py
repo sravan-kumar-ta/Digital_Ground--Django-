@@ -15,7 +15,8 @@ class CustomUserAdmin(UserAdmin):
                 'fields': (
                     'first_name',
                     'last_name',
-                    'username'
+                    'username',
+                    'phone_number'
                 ),
             },
         ),
